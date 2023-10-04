@@ -1,0 +1,127 @@
+﻿@using MinimartWeb.Models;
+@model List<Product>
+
+@{
+    Layout = "/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<form role="form" action="/Admin/AdminChucNang/Product" method="post">
+    <div class="form-group">
+        <label>ProductId:</label>
+        <input type="text" class="form-control" value="@Model[0].ProductId" id="ProductId" readonly>
+    </div>
+    <div class="form-group">
+        <label>ProductName:</label>
+        <input type="text" class="form-control" value="@Model[0].ProductName" id="ProductName">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Price:</label>
+        <input type="number" class="form-control" value="@Model[0].PriceProduct" id="PriceProduct">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Discount:</label>
+        <input type="number" class="form-control" value="@Model[0].Discount" id="Discount">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Stock:</label>
+        <input type="number" class="form-control" value="@Model[0].Stock" id="Stock">
+    </div>
+    <div class="form-group">
+        <label for="pwd">CateId:</label>
+        <input type="text" class="form-control" value="@Model[0].CateName" id="CateId" readonly>
+    </div>
+    <div class="form-group">
+        <label>IsHot</label>
+        <select id="IsHot">
+            <option value="1">true</option>
+            <option value="0">false</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">Image Product</label>
+        <div class="form-group">
+            <label for="image">Chọn file</label>
+            <input type="file" id="imageUpload">
+            <input type="text" value="@Model[0].ImgProduct" id="ImgProduct" readonly />
+        </div>
+        <div id="imageNewFay">
+            <img style="width: 60px" src="~/image/@Model[0].ImgProduct" />
+        </div>
+    </div> <!-- form-group // -->
+    <button type="button" onclick="addNewMusic()">
+        Update Product
+    </button>
+</form>
+@section ScriptAdmin
+    {
+    <script>
+        $('#imageUpload').on('change', function () {
+            var files = $(this).prop('files');
+            var formData = new FormData();
+            formData.append("imageUpload", files[0]);
+
+            $.ajax({
+                type: 'POST',
+                url: '/Admin/AdminChucNang/UploadImageProduct',
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+
+                },
+                success: function (res) {
+                    console.log(res.filePath);
+                    $('input[id="ImgProduct"]').val(res.fileName);
+                    let srcImage = res.fileName;
+                    $('#imageNewFay').html('');
+                    let html = `
+                                         <img style="width: 60px" src="/image/${srcImage}" />
+                                    `;
+                    $('#imageNewFay').append(html);
+                    console.log(res);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        });
+
+        function addNewMusic() {
+
+
+            let obj = {
+                ProductId: $('#ProductId').val(),
+                ProductName: $('#ProductName').val(),
+                // CateId: $('#CateId').val(),
+                PriceProduct: $('#PriceProduct').val(),
+                Discount: $('#Discount').val(),
+                IsHotString: $('#IsHot').val(),
+                Stock: $('#Stock').val(),
+                ImgProduct: $('#ImgProduct').val()
+            }
+            console.log(obj);
+            $.ajax({
+                url: "/Admin/AdminChucNang/EditProductItem",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(obj),
+                beforeSend: function () {
+                    console.log("Before");
+                    console.log(obj);
+                },
+                success: function (res) {
+                    if (res == 1) {
+                        alert("Update thành công!");
+                        window.location.href = '/Admin/Home/index';
+                    }
+                },
+                error: function (error) {
+                    console.log("Lỗi");
+                    console.log(error);
+                    alert("Update thất bại...");
+                }
+            })
+        }
+
+    </script>
+}

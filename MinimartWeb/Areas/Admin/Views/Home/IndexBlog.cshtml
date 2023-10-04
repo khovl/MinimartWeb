@@ -1,0 +1,67 @@
+﻿@using MinimartWeb.Models;
+@{
+    Layout = "/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@model List<Blog>
+
+<!-- Content Wrapper -->
+<div id="content-wrapper" class="d-flex flex-column">
+    <!-- Main Content -->
+    <div id="content">
+
+        <!-- Topbar -->
+        <!-- End of Topbar -->
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Danh sách tin tức</h6>
+                </div>
+
+                <a href="/Admin/AdminChucNang/Product">Add Blog</a>
+
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>Id</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Tác giả</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Nội dung</th>
+                                    <th>IsHot</th>
+                                    <th>Avct</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><img style="width: 50px" src="~/image/@item.ImgBlog" /></td>
+                                        <td>@item.BlogId</td>
+                                        <td>@item.BlogTilte</td>
+                                        <td>@item.Author</td>
+                                        <td>@item.CreateDate.ToString("dd/mm/yyyy")</td>
+                                        <td>@item.Content</td>
+                                        <td>@item.IsHotNews</td>
+                                        <td>
+                                            <a href="/Admin/AdminChucNang/EditBlog?id=@item.BlogId" class="btn btn-warning">Sửa</a>
+                                            <a href="/Admin/AdminChucNang/DeleteBlog?id=@item.BlogId" class="btn btn-danger">Xóa</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+    </div>
+</div>

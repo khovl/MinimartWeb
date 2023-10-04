@@ -1,0 +1,132 @@
+﻿@using MinimartWeb.Models;
+@model List<Category>
+
+@{
+    Layout = "/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<form role="form" action="/Admin/AdminChucNang/Product" method="post">
+    <div class="form-group">
+        <label>ProductName:</label>
+        <input type="text" class="form-control" id="ProductName">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Price:</label>
+        <input type="number" class="form-control" id="PriceProduct">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Discount:</label>
+        <input type="number" class="form-control" id="Discount">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Stock:</label>
+        <input type="number" class="form-control" id="Stock">
+    </div>
+    <div class="form-group">
+        <label for="">Category</label>
+        <select id="CateId">
+            <option value="0">Lựa chọn</option>
+            @{
+                foreach (var item in Model)
+                {
+                    <option value="@item.CateId">@item.CateName</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label>IsHot</label>
+        <select id="IsHot">
+            <option value="1">true</option>
+            <option value="0">false</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">Image Product</label>
+        <div class="form-group">
+            <label for="image">Chọn file</label>
+            <input type="file" id="imageUpload">
+            <input type="text" id="ImgProduct" readonly />
+        </div>
+        <div id="imageNewFay">
+            <img style="width: 60px" src="" />
+        </div>
+    </div> <!-- form-group // -->
+    <button type="button" onclick="addNewProduct()">
+        Add Product
+    </button>
+</form>
+    
+
+@section ScriptAdmin
+    {
+    <script>
+        $('#imageUpload').on('change', function () {
+            var files = $(this).prop('files');
+            var formData = new FormData();
+            formData.append("imageUpload", files[0]);
+
+            $.ajax({
+                type: 'POST',
+                url: '/Admin/AdminChucNang/UploadImageProduct',
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+
+                },
+                success: function (res) {
+                    console.log(res.filePath);
+                    $('input[id="ImgProduct"]').val(res.fileName);
+                    let srcImage = res.fileName;
+                    $('#imageNewFay').html('');
+                    let html = `
+                                 <img style="width: 60px" src="/image/${srcImage}" />
+                            `;
+                    $('#imageNewFay').append(html);
+                    console.log(res);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        });
+
+        function addNewProduct() {
+
+           
+            let obj = {
+                ProductName: $('#ProductName').val(),
+                CateId: $('#CateId').val(),
+                PriceProduct: $('#PriceProduct').val(),
+                Discount: $('#Discount').val(),
+                IsHotString: $('#IsHot').val(),
+                Stock: $('#Stock').val(),
+                ImgProduct: $('#ImgProduct').val()
+            } 
+            console.log(obj);
+            $.ajax({
+                url: "/Admin/AdminChucNang/AddProduct",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(obj),
+                beforeSend: function () {
+                    console.log("Before");
+                    console.log(obj);
+                },
+                success: function (res) {
+                    if (res == 1) {
+                        alert("Thêm mới thành công !");
+                        window.location.href = '/Admin/Home/index';
+                    }
+                },
+                error: function (error) {
+                    console.log("Lỗi");
+                    console.log(error);
+                    alert("Thêm mới thất bại...");
+                }
+            })
+        }
+
+    </script>
+}

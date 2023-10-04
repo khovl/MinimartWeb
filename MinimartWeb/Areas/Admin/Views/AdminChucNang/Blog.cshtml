@@ -1,0 +1,112 @@
+﻿@using MinimartWeb.Models;
+@model List<Blog>
+
+@{
+    Layout = "/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<form role="form" action="/Admin/AdminChucNang/Product" method="post">
+    <div class="form-group">
+        <label>Tiêu đề</label>
+        <input type="text" class="form-control" id="ProductTitle">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Tác giả</label>
+        <input type="text" class="form-control" id="Author">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Content</label>
+        <input type="text" class="form-control" id="Content">
+    </div>
+    
+    <div class="form-group">
+        <label>IsHotNews</label>
+        <select id="IsHotNews">
+            <option value="1">true</option>
+            <option value="0">false</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">Image B</label>
+        <div class="form-group">
+            <label for="image">Chọn file</label>
+            <input type="file" id="imageUpload">
+            <input type="text" id="ImgBlog" readonly />
+        </div>
+        <div id="imageNewFay">
+            <img style="width: 60px" src="" />
+        </div>
+    </div> <!-- form-group // -->
+    <button type="button" onclick="addNewMusic()">
+        Thêm mới
+    </button>
+</form>
+@section ScriptAdmin
+    {
+    <script>
+        $('#imageUpload').on('change', function () {
+            var files = $(this).prop('files');
+            var formData = new FormData();
+            formData.append("imageUpload", files[0]);
+
+            $.ajax({
+                type: 'POST',
+                url: '/Admin/AdminChucNang/UploadImageProduct',
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+
+                },
+                success: function (res) {
+                    console.log(res.filePath);
+                    $('input[id="ImgBlog"]').val(res.fileName);
+                    let srcImage = res.fileName;
+                    $('#imageNewFay').html('');
+                    let html = `
+                                         <img style="width: 60px" src="/image/${srcImage}" />
+                                    `;
+                    $('#imageNewFay').append(html);
+                    console.log(res);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        });
+
+        function addNewMusic() {
+
+
+            let obj = {
+                ProductTitle: $('#ProductTitle').val(),
+                Author: $('#Author').val(),
+                Content: $('#Content').val(),
+                // IsHotNews: $('#IsHotNews').val(),
+                ImgBlog: $('#ImgBlog').val(),
+            }
+            console.log(obj);
+            $.ajax({
+                url: "/Admin/AdminChucNang/AddBlog",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(obj),
+                beforeSend: function () {
+                    console.log("Before");
+                    console.log(obj);
+                },
+                success: function (res) {
+                    if (res == 1) {
+                        alert("Thêm mới thành công !");
+                    }
+                },
+                error: function (error) {
+                    console.log("Lỗi");
+                    console.log(error);
+                    alert("Thêm mới thất bại...");
+                }
+            })
+        }
+
+    </script>
+}

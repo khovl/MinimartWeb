@@ -1,0 +1,123 @@
+﻿@using MinimartWeb.Models;
+@model List<Blog>
+
+@{
+    Layout = "/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<form role="form" action="/Admin/AdminChucNang/Blog" method="post">
+    <div class="form-group">
+        <label>BlogID:</label>
+        <input type="text" class="form-control" value="@Model[0].BlogId" id="BlogId" readonly>
+    </div>
+    <div class="form-group">
+        <label>Title:</label>
+        <input type="text" class="form-control" value="@Model[0].BlogTilte" id="BlogTilte">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Author:</label>
+        <input type="text" class="form-control" value="@Model[0].Author" id="Author">
+    </div>
+     <div class="form-group">
+        <label for="pwd">Nội dung</label>
+        <input type="text" class="form-control" value="@Model[0].Content" id="Content">
+    </div>
+    <div class="form-group">
+        <label for="pwd">Ngày Tạo:</label>
+        <input type="datetime" class="form-control" value="@Model[0].CreateDate" id="CreateDate">
+    </div>
+  
+  
+    <div class="form-group">
+        <label>IsHot</label>
+        <select id="IsHotNews">
+            <option value="1">true</option>
+            <option value="0">false</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name" class="col-sm-3 control-label">Image</label>
+        <div class="form-group">
+            <label for="image">Chọn file</label>
+            <input type="file" id="imageUpload">
+            <input type="text" value="@Model[0].ImgBlog" id="ImgBlog" readonly />
+        </div>
+        <div id="imageNewFay">
+            <img style="width: 60px" src="~/image/@Model[0].ImgBlog" />
+        </div>
+    </div> <!-- form-group // -->
+    <button type="button" onclick="addNewMusic()">
+        Update Product
+    </button>
+</form>
+@section ScriptAdmin
+    {
+    <script>
+        $('#imageUpload').on('change', function () {
+            var files = $(this).prop('files');
+            var formData = new FormData();
+            formData.append("imageUpload", files[0]);
+
+            $.ajax({
+                type: 'POST',
+                url: '/Admin/AdminChucNang/UploadImageProduct',
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+
+                },
+                success: function (res) {
+                    console.log(res.filePath);
+                    $('input[id="ImgBlog"]').val(res.fileName);
+                    let srcImage = res.fileName;
+                    $('#imageNewFay').html('');
+                    let html = `
+                                                 <img style="width: 60px" src="/image/${srcImage}" />
+                                            `;
+                    $('#imageNewFay').append(html);
+                    console.log(res);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        });
+
+        function addNewMusic() {
+
+
+            let obj = {
+                BlogId: $('#BlogId').val(),
+                BlogTitle: $('#BlogTitle').val(),             
+                CreateDate: $('#CreateDate').val(),
+                Author: $('#Author').val(),
+                IsHotNewsString: $('#IsHotNews').val(),
+                ImgBlog: $('#ImgBlog').val()
+            }
+            console.log(obj);
+            $.ajax({
+                url: "/Admin/AdminChucNang/EditBlogItem",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(obj),
+                beforeSend: function () {
+                    console.log("Before");
+                    console.log(obj);
+                },
+                success: function (res) {
+                    if (res == 1) {
+                        alert("Update thành công!");
+                        window.location.href = '/Admin/Home/IndexBlog';
+                    }
+                },
+                error: function (error) {
+                    console.log("Lỗi");
+                    console.log(error);
+                    alert("Update thất bại...");
+                }
+            })
+        }
+
+    </script>
+}
